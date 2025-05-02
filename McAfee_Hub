@@ -1,0 +1,391 @@
+-- McAfee Hub
+-- loadstring(game:HttpGet("https://raw.githubusercontent.com/Alanxax22/McAfee_Hub/main/McAfee_Hub"))()
+---------------------------------------------------------------------------------------------------
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
+local Stats = game:GetService("Stats")
+local UIS = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "McAfeeUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 800, 0, 500)
+mainFrame.Position = UDim2.new(0.5, -400, 0.5, -250)
+mainFrame.BackgroundColor3 = Color3.fromRGB(245, 245, 245)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Parent = screenGui
+
+local screenCenterPos = UDim2.new(0.5, -400, 0.5, -250)
+local screenBottomPos = UDim2.new(0.5, -400, 1, 0)
+
+local header = Instance.new("Frame")
+header.Size = UDim2.new(1, 0, 0, 50)
+header.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+header.BorderSizePixel = 0
+header.Parent = mainFrame
+
+local logoImage = Instance.new("ImageLabel")
+logoImage.Size = UDim2.new(0, 400, 0, 80)
+logoImage.Position = UDim2.new(0, -125, 0.5, -40)
+logoImage.BackgroundTransparency = 1
+logoImage.Image = "rbxassetid://97990924434150"
+logoImage.ScaleType = Enum.ScaleType.Fit
+logoImage.Parent = header
+
+local sidebar = Instance.new("Frame")
+sidebar.Size = UDim2.new(0, 200, 1, -50)
+sidebar.Position = UDim2.new(0, 0, 0, 50)
+sidebar.BackgroundColor3 = Color3.fromRGB(235, 235, 235)
+sidebar.BorderSizePixel = 0
+sidebar.Parent = mainFrame
+
+local function animateButton(button)
+	local originalColor = button.BackgroundColor3
+	local hoverColor = Color3.fromRGB(255, 255, 255)
+	local clickColor = Color3.fromRGB(181, 46, 37)
+
+	button.MouseEnter:Connect(function()
+		TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = hoverColor}):Play()
+	end)
+
+	button.MouseLeave:Connect(function()
+		if button:GetAttribute("Selected") then
+			TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = clickColor}):Play()
+		else
+			TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = originalColor}):Play()
+		end
+	end)
+
+	button.MouseButton1Click:Connect(function()
+		for _, btn in pairs(button.Parent:GetChildren()) do
+			if btn:IsA("TextButton") then
+				btn:SetAttribute("Selected", false)
+				TweenService:Create(btn, TweenInfo.new(0.2), {BackgroundColor3 = originalColor}):Play()
+				btn.TextColor3 = Color3.fromRGB(80, 80, 80)
+			end
+		end
+		button:SetAttribute("Selected", true)
+		TweenService:Create(button, TweenInfo.new(0.2), {BackgroundColor3 = clickColor}):Play()
+		button.TextColor3 = Color3.fromRGB(255, 255, 255)
+	end)
+end
+
+local sections = {"Home", "Scan", "Update", "Settings"}
+local buttons = {}
+local contentFrames = {}
+
+for i, section in ipairs(sections) do
+	local button = Instance.new("TextButton")
+	button.Size = UDim2.new(1, 0, 0, 50)
+	button.Position = UDim2.new(0, 0, 0, (i - 1) * 50)
+	button.BackgroundColor3 = Color3.fromRGB(235, 235, 235)
+	button.BorderSizePixel = 0
+	button.Text = section
+	button.Font = Enum.Font.Gotham
+	button.TextSize = 18
+	button.TextColor3 = Color3.fromRGB(80, 80, 80)
+	button.Parent = sidebar
+	buttons[section] = button
+
+	local contentFrame = Instance.new("Frame")
+	contentFrame.Size = UDim2.new(1, -200, 1, -50)
+	contentFrame.Position = UDim2.new(0, 200, 0, 50)
+	contentFrame.BackgroundColor3 = Color3.fromRGB(250, 250, 250)
+	contentFrame.BorderSizePixel = 0
+	contentFrame.Visible = false
+	contentFrame.Parent = mainFrame
+	contentFrames[section] = contentFrame
+
+	animateButton(button)
+
+	button.MouseButton1Click:Connect(function()
+		for _, cf in pairs(contentFrames) do
+			cf.Visible = false
+		end
+		contentFrame.Visible = true
+	end)
+end
+
+contentFrames["Home"].Visible = true
+buttons["Home"]:SetAttribute("Selected", true)
+buttons["Home"].BackgroundColor3 = Color3.fromRGB(181, 46, 37)
+buttons["Home"].TextColor3 = Color3.fromRGB(255, 255, 255)
+
+local homeLabel = Instance.new("TextLabel")
+homeLabel.Size = UDim2.new(1, -40, 0, 30)
+homeLabel.Position = UDim2.new(0, 20, 0, 20)
+homeLabel.BackgroundTransparency = 1
+homeLabel.Text = "Welcome to McAfee Total Protection"
+homeLabel.Font = Enum.Font.GothamBold
+homeLabel.TextSize = 20
+homeLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
+homeLabel.TextXAlignment = Enum.TextXAlignment.Left
+homeLabel.Parent = contentFrames["Home"]
+
+local scanLabel = Instance.new("TextLabel")
+scanLabel.Size = UDim2.new(1, -40, 0, 30)
+scanLabel.Position = UDim2.new(0, 20, 0, 20)
+scanLabel.BackgroundTransparency = 1
+scanLabel.Text = "Scan Your Computer"
+scanLabel.Font = Enum.Font.GothamBold
+scanLabel.TextSize = 20
+scanLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
+scanLabel.TextXAlignment = Enum.TextXAlignment.Left
+scanLabel.Parent = contentFrames["Scan"]
+
+local scanButton = Instance.new("TextButton")
+scanButton.Size = UDim2.new(0, 150, 0, 40)
+scanButton.Position = UDim2.new(0, 20, 0, 70)
+scanButton.BackgroundColor3 = Color3.fromRGB(181, 46, 37)
+scanButton.BorderSizePixel = 0
+scanButton.Text = "Start Scan"
+scanButton.Font = Enum.Font.GothamBold
+scanButton.TextSize = 18
+scanButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+scanButton.Parent = contentFrames["Scan"]
+
+local scanButtonCorner = Instance.new("UICorner")
+scanButtonCorner.CornerRadius = UDim.new(0, 3)
+scanButtonCorner.Parent = scanButton
+
+animateButton(scanButton)
+
+local progressBarBg = Instance.new("Frame")
+progressBarBg.Size = UDim2.new(0, 400, 0, 20)
+progressBarBg.Position = UDim2.new(0, 20, 0, 130)
+progressBarBg.BackgroundColor3 = Color3.fromRGB(220, 220, 220)
+progressBarBg.BorderSizePixel = 0
+progressBarBg.Parent = contentFrames["Scan"]
+
+local progressBarBgCorner = Instance.new("UICorner")
+progressBarBgCorner.CornerRadius = UDim.new(0, 3)
+progressBarBgCorner.Parent = progressBarBg
+
+local progressBar = Instance.new("Frame")
+progressBar.Size = UDim2.new(0, 0, 1, 0)
+progressBar.BackgroundColor3 = Color3.fromRGB(181, 46, 37)
+progressBar.BorderSizePixel = 0
+progressBar.Parent = progressBarBg
+
+local progressBarCorner = Instance.new("UICorner")
+progressBarCorner.CornerRadius = UDim.new(0, 3)
+progressBarCorner.Parent = progressBar
+
+local percentLabel = Instance.new("TextLabel")
+percentLabel.Size = UDim2.new(0, 50, 0, 20)
+percentLabel.Position = UDim2.new(0, 430, 0, 130)
+percentLabel.BackgroundTransparency = 1
+percentLabel.Text = "0%"
+percentLabel.Font = Enum.Font.Gotham
+percentLabel.TextSize = 20
+percentLabel.TextColor3 = Color3.fromRGB(40, 40, 40)
+percentLabel.TextXAlignment = Enum.TextXAlignment.Left
+percentLabel.Parent = contentFrames["Scan"]
+
+local statusText = Instance.new("TextLabel")
+statusText.Size = UDim2.new(1, -40, 0, 30)
+statusText.Position = UDim2.new(0, 20, 0, 160)
+statusText.BackgroundTransparency = 1
+statusText.Text = "Scan for threats?"
+statusText.Font = Enum.Font.Gotham
+statusText.TextSize = 18
+statusText.TextColor3 = Color3.fromRGB(80, 80, 80)
+statusText.TextXAlignment = Enum.TextXAlignment.Left
+statusText.Parent = contentFrames["Scan"]
+
+local scanning = false
+local progress = 0
+
+local function getProgressColor(p)
+	if p < 0.5 then
+		local t = p / 0.5
+		return Color3.new(
+			(1 - t) * (240/255) + t * (240/255),
+			(1 - t) * (100/255) + t * (210/255),
+			(1 - t) * (100/255) + t * (100/255)
+		)
+	else
+		local t = (p - 0.5) / 0.5
+		return Color3.new(
+			(1 - t) * (240/255) + t * (100/255),
+			(1 - t) * (210/255) + t * (220/255),
+			(1 - t) * (100/255) + t * (100/255)
+		)
+	end
+end
+
+scanButton.MouseButton1Click:Connect(function()
+	if not scanning then
+		if progress >= 1 then
+			progress = 0
+			progressBar.Size = UDim2.new(0, 0, 1, 0)
+			percentLabel.Text = "0%"
+		end
+		scanning = true
+		scanButton.Text = "Pause Scan"
+		statusText.Text = "Scanning for threats please wait!"
+	else
+		scanning = false
+		scanButton.Text = "Resume Scan"
+		statusText.Text = "Paused!"
+		return
+	end
+
+	coroutine.wrap(function()
+		while scanning and progress < 1 do
+			local delta = math.random(1, 5) / 100
+			progress = math.min(progress + delta, 1)
+
+			local goalSize = UDim2.new(progress, 0, 1, 0)
+			local goalColor = getProgressColor(progress)
+
+			TweenService:Create(progressBar, TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+				Size = goalSize,
+				BackgroundColor3 = goalColor
+			}):Play()
+
+			percentLabel.Text = math.floor(progress * 100) .. "%"
+			
+			if math.random() < 0.3 then
+				wait(math.random(3, 7) / 10)
+			end
+			wait(0.1)
+		end
+
+		if progress >= 1 then
+			scanning = false
+			scanButton.Text = "Retake Scan"
+			statusText.Text = "No new threats found!"
+		end
+	end)()
+end)
+
+local function identifyExecutor()
+	local success, executor = pcall(function()
+		return (identifyexecutor and identifyexecutor()) or "Unknown"
+	end)
+	return success and executor or "Unknown"
+end
+
+local executor = identifyExecutor()
+local hotkey = Enum.KeyCode.M
+local changingHotkey = false
+
+local settingsInfo = Instance.new("TextLabel")
+settingsInfo.Size = UDim2.new(1, -40, 0, 90)
+settingsInfo.Position = UDim2.new(0, 20, 0, 20)
+settingsInfo.BackgroundTransparency = 1
+settingsInfo.Font = Enum.Font.Gotham
+settingsInfo.TextSize = 16
+settingsInfo.TextColor3 = Color3.fromRGB(40, 40, 40)
+settingsInfo.TextXAlignment = Enum.TextXAlignment.Left
+settingsInfo.TextYAlignment = Enum.TextYAlignment.Top
+settingsInfo.TextWrapped = true
+settingsInfo.Text = "Username: " .. player.Name .. "\nExecutor: " .. tostring(executor) .. "\nFPS: 0\nPing: N/A"
+settingsInfo.Parent = contentFrames["Settings"]
+
+local changeHotkey = Instance.new("TextButton")
+changeHotkey.Size = UDim2.new(0, 150, 0, 40)
+changeHotkey.Position = UDim2.new(0, 20, 0, 100)
+changeHotkey.BackgroundColor3 = Color3.fromRGB(181, 46, 37)
+changeHotkey.BorderSizePixel = 0
+changeHotkey.Font = Enum.Font.GothamBold
+changeHotkey.TextSize = 16
+changeHotkey.TextColor3 = Color3.fromRGB(255, 255, 255)
+changeHotkey.Text = "Change Hotkey: " .. hotkey.Name
+changeHotkey.TextScaled = false
+changeHotkey.TextWrapped = true
+changeHotkey.Parent = contentFrames["Settings"]
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 3)
+corner.Parent = changeHotkey
+
+animateButton(changeHotkey)
+
+changeHotkey.MouseButton1Click:Connect(function()
+	changingHotkey = true
+	changeHotkey.Text = "Press a key..."
+end)
+
+UIS.InputBegan:Connect(function(input, gp)
+	if changingHotkey and input.UserInputType == Enum.UserInputType.Keyboard then
+		hotkey = input.KeyCode
+		changeHotkey.Text = "Change Hotkey: " .. hotkey.Name
+		changingHotkey = false
+	end
+end)
+
+local lastUpdateTime = 0
+RunService.RenderStepped:Connect(function()
+	local now = tick()
+	if now - lastUpdateTime >= 0.5 then
+		local fps = math.floor(1 / (RunService.RenderStepped:Wait()))
+		local pingStat = Stats:FindFirstChild("PerformanceStats") and Stats.PerformanceStats:FindFirstChild("Ping")
+		local ping = pingStat and math.floor(pingStat:GetValue()) or "N/A"
+		settingsInfo.Text = "Username: " .. player.Name .. "\nExecutor: " .. tostring(executor) .. "\nFPS: " .. fps .. "\nPing: " .. tostring(ping)
+		lastUpdateTime = now
+	else
+		RunService.RenderStepped:Wait()
+	end
+end)
+
+local isUIVisible = true
+local lastToggleTime = 0
+local toggleCooldown = 1
+
+local function getRandomOffscreenPosition()
+	local screenWidth = workspace.CurrentCamera.ViewportSize.X
+	local screenHeight = workspace.CurrentCamera.ViewportSize.Y
+
+	local randomX = math.random(0, screenWidth)
+	local randomY = math.random(0, screenHeight)
+
+	local offsetX = math.random(-800, 800)
+	local offsetY = math.random(-500, 500)
+
+	return UDim2.new(0, randomX + offsetX - 400, 0, randomY + offsetY - 250)
+end
+
+local function toggleUI()
+	local now = tick()
+	if now - lastToggleTime < toggleCooldown then
+		return
+	end
+	lastToggleTime = now
+
+	if isUIVisible then
+		local tween = TweenService:Create(mainFrame, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+			Position = screenBottomPos
+		})
+		tween:Play()
+		tween.Completed:Connect(function()
+			screenGui.Enabled = false
+		end)
+	else
+		mainFrame.Position = getRandomOffscreenPosition()
+		screenGui.Enabled = true
+
+		local tween = TweenService:Create(mainFrame, TweenInfo.new(0.6, Enum.EasingStyle.Bounce, Enum.EasingDirection.Out), {
+			Position = screenCenterPos
+		})
+		tween:Play()
+	end
+
+	isUIVisible = not isUIVisible
+end
+
+UIS.InputBegan:Connect(function(input, gameProcessed)
+	if not gameProcessed and input.KeyCode == hotkey and not changingHotkey then
+		toggleUI()
+	end
+end)
